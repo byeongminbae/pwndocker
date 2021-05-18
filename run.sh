@@ -32,11 +32,12 @@ function sanity_check()
 	if  [ "${#}" != 2 ] || \
 		([ "${1}" != "run" ] && [ "${1}" != "build" ]) || \
 		([ ! `echo "${2}" | grep -E "([0-9]{2}\.[0-9]{2})"` ] && [ "${2}" != "all" ]); then 
-			log error "Usage: ${0} [run | build] [VERSION [16.04, 17.04, 18.04, 19.04, 20.04]]";
+			log error "usage: ${0} [run] [build] <version>"
+			log error "versions: all, 16.04, 17.04, 18.04, 19.04, 20.04";
 			exit
 	fi
 	if [ "${1}" == "run" ] && [ "${2}" == "all" ] ; then
-		log error "Usage: ${0} asdasd[run | build] [VERSION [16.04, 17.04, 18.04, 19.04, 20.04]]";
+		log error "usage: ${0} build all";
 		exit
 	fi
 }
