@@ -12,9 +12,9 @@ GREEN="\033[1;32m"
 
 NC="\033[0m" # no color
 
-log() # info, warning, error
+function log() # info, warning, error 
 {
-	case $1 in
+	case "$1" in
 		info)
 			echo -e "${NC}[${GREEN}INFO${NC}] $2"	
 			;;
@@ -27,15 +27,35 @@ log() # info, warning, error
 	esac
 }
 
-main()
+function sanity_check()
+{
+	if  [ "${#}" != 2 ] || \
+		([ "${1}" != "run" ] && [ "${1}" != "build" ]) || \
+		([ ! `echo "${2}" | grep -E "([0-9]{2}\.[0-9]{2})"` ] && [ "${2}" != "all" ]); then 
+			log error "Usage: ${0} [run | build] [VERSION [16.04, 17.04, 18.04, 19.04, 20.04]]";
+			exit
+	fi
+	if [ "${1}" == "run" ] && [ "${2}" == "all" ] ; then
+		log error "Usage: ${0} asdasd[run | build] [VERSION [16.04, 17.04, 18.04, 19.04, 20.04]]";
+		exit
+	fi
+}
+
+function main()
 {
 	log info "${YELLOW}${PROJECT} - ${DESCRIPTION}${NC}"
 	log info "Author - ${GITHUB}"
-	if  [ "${#}" != 2 ] ||\
-		([ "${1}" != "run" ] && [ "${1}" != "build" ]) ||\
-		!(echo ${2} | grep -E "([0-9]{2}\.[0-9]{2})"); then
-			log error "Usage: $0 [run | build] [VERSION [16.04, 17.04, 18.04, 19.04, 20.04]]";
-		exit
+
+	sanity_check $@
+
+	if [ "${1}" == "build" ]; then
+		if [ "${2}" == "all" ]; then
+			log error "To-Do"
+			#docker build -t pwnker "./ubuntu-*"
+			exit
+		fi
+		else 
+			docker build -t pwnker-ubuntu-"{$2}" "./ubuntu-{$2}"
 	fi
 }
 
