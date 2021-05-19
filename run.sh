@@ -5,6 +5,8 @@ AUTHOR="Andrew Bae"
 GITHUB="github.com/andrewbae"
 DESCRIPTION="A docker environment for pwners"
 
+VERSIONS=("16.04" "17.04" "18.04" "19.04" "20.04")
+
 # Colors preferences
 RED="\033[1;31m"
 YELLOW="\033[1;33m"
@@ -33,7 +35,7 @@ function sanity_check()
 		([ "${1}" != "run" ] && [ "${1}" != "build" ]) || \
 		([ ! `echo "${2}" | grep -E "([0-9]{2}\.[0-9]{2})"` ] && [ "${2}" != "all" ]); then 
 			log error "usage: ${0} [run] [build] <version>"
-			log error "versions: all, 16.04, 17.04, 18.04, 19.04, 20.04";
+			log error "versions: all, `for v0 in ${VERSIONS[@]}; do echo -e $v0", \c"; done`"
 			exit
 	fi
 	if [ "${1}" == "run" ] && [ "${2}" == "all" ] ; then
@@ -51,12 +53,12 @@ function main()
 
 	if [ "${1}" == "build" ]; then
 		if [ "${2}" == "all" ]; then
-			log error "To-Do"
+			log rror "To-Do"
 			#docker build -t pwnker "./ubuntu-*"
 			exit
+		else
+			docker build -t "pwnker-ubuntu-${2}" "./ubuntu-${2}" --no-cache=false
 		fi
-		else 
-			docker build -t pwnker-ubuntu-"{$2}" "./ubuntu-{$2}"
 	fi
 }
 
