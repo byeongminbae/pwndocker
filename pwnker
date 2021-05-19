@@ -7,6 +7,9 @@ DESCRIPTION="A docker environment for pwners"
 
 VERSIONS=("16.04" "17.04" "18.04" "19.04" "20.04")
 
+INSTALL_DIR="/usr/local/bin"
+PWNKER_DIR="${INSTALL_DIR}/pwnker-dir"
+
 # Colors preferences
 RED="\033[1;31m"
 YELLOW="\033[1;33m"
@@ -57,7 +60,7 @@ function main()
 			#docker build -t pwnker "./ubuntu-*"
 			exit
 		else
-			docker build -t "pwnker-ubuntu-${2}" "./ubuntu-${2}" --no-cache=false
+			docker build -t "pwnker-ubuntu-${2}" "${PWNKER_DIR}/ubuntu-${2}" --no-cache=false
 		fi
 	fi
 
