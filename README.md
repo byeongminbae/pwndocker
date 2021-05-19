@@ -9,3 +9,8 @@ Especially, heap exploitation requires various environments because the exploit 
 
 If you had to face any inconvenience or found some improvements for pwnker, Please leave me an issue.
 
+## Installation
+
+```sh
+/bin/bash -c "$(curl https://raw.githubusercontent.com/andrewbae/pwnker/master/setup.sh) install"
+```
