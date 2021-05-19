@@ -60,6 +60,11 @@ function main()
 			docker build -t "pwnker-ubuntu-${2}" "./ubuntu-${2}" --no-cache=false
 		fi
 	fi
+
+	if [ "${1}" == "run" ]; then
+		docker run -d --rm -h "pwnker-ubuntu-${2}" --name "pwnker-ubuntu-${2}" -v $PWD:/pwn -p 12341:12341 --cap-add=SYS_PTRACE -t "pwnker-ubuntu-${2}" /bin/bash 
+		docker exec -it "pwnker-ubuntu-${2}" /bin/bash
+	fi
 }
 
 main $@
