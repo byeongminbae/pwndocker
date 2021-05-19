@@ -61,7 +61,24 @@ function main()
 		}
 
 	elif [ "${1}" == "uninstall" ]; then
-		echo "${1}"
+		uninstall_list="${PWNKER_DIR} ${INSTALL_DIR}/pwnker"
+		if [ ! -d "${PWNKER_DIR}" ] && [ ! -f "${INSTALL_DIR}/pwnker" ]; then
+			log error "Cannot found \"${PWNKER_DIR}\" and \"${INSTALL_DIR}/pwnker\" please check out pwnker is installed correctly"
+			exit
+		fi
+		if [ ! -d "${PWNKER_DIR}" ]; then
+			log warning "Cannot found \"${PWNKER_DIR}\" please check out pwnker is installed correctly"
+			uninstall_list="${INSTALL_DIR}/pwnker"		
+		elif [ ! -f "${INSTALL_DIR}/pwnker" ]; then
+			log warning "Cannot found \"${INSTALL_DIR}/pwnker\" please check out pwnker is installed correctly"
+			uninstall_list="${PWNKER_DIR}"		
+		fi
+		{
+			log info "rm -rf ${uninstall_list}"
+			rm -rf ${uninstall_list}
+		} || {
+			log error "Uninstallation failed"
+		}
 	fi
 }
 
