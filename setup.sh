@@ -49,13 +49,13 @@ function main()
 	if [ "${1}" == "install" ]; then
 		{
 			log info "mkdir ${PWNKER_DIR}"
-			mkdir "${PWNKER_DIR}"
+			sudo mkdir "${PWNKER_DIR}"
 			
 			log info "git clone https://github.com/andrewbae/pwnker ${PWNKER_DIR}"
-			git clone https://github.com/andrewbae/pwnker ${PWNKER_DIR}
+			sudo git clone https://github.com/andrewbae/pwnker ${PWNKER_DIR}
 
 			log info "ln -s ${PWNKER_DIR}/pwnker ${INSTALL_DIR}/pwnker"
-			ln -s ${PWNKER_DIR}/pwnker ${INSTALL_DIR}/pwnker
+			sudo ln -s ${PWNKER_DIR}/pwnker ${INSTALL_DIR}/pwnker
 		} || {
 			log error "Installation failed"
 		}
@@ -75,7 +75,7 @@ function main()
 		fi
 		{
 			log info "rm -rf ${uninstall_list}"
-			rm -rf ${uninstall_list}
+			sudo rm -rf ${uninstall_list}
 		} || {
 			log error "Uninstallation failed"
 		}
