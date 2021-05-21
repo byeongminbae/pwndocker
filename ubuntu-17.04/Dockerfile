@@ -1,8 +1,6 @@
 FROM ubuntu:17.04
 MAINTAINER Andrew Bae <andy@pwner.kr>
 
-RUN sed -i 's/archive.ubuntu.com/mirror.kakao.com/g' /etc/apt/sources.list
-
 RUN dpkg --add-architecture i386 && \
 	apt update -y && \
 	apt install -y \
