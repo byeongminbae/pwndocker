@@ -1,6 +1,8 @@
 FROM ubuntu:20.04
 MAINTAINER Andrew Bae <andy@pwner.kr>
 
+ARG DEBIAN_FRONTEND=noninteractive
+
 RUN dpkg --add-architecture i386 && \
 	apt update -y && \
 	apt install -y \
