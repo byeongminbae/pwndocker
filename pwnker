@@ -54,7 +54,10 @@ function argument_handling()
 		"build")			
 			if [ "${2}" == "all" ]; then
 				log warning "To-Do"
-				#docker build -t pwnker "./ubuntu-*"
+				for version in ${VERSIONS[@]}
+					do 
+						docker build -t "pwnker-ubuntu-${version}" "${PWNKER_DIR}/ubuntu-${version}" --no-cache=false
+					done
 			else
 				docker build -t "pwnker-ubuntu-${2}" "${PWNKER_DIR}/ubuntu-${2}" --no-cache=false
 			fi
