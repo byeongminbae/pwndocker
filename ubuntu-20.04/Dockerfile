@@ -1,4 +1,4 @@
-FROM ubuntu:19.04
+FROM ubuntu:20.04
 MAINTAINER Andrew Bae <andy@pwner.kr>
 
 RUN dpkg --add-architecture i386 && \
