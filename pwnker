@@ -35,9 +35,9 @@ function log() # info, warning, error
 function sanity_check()
 {
 	if  [ "${#}" != 2 ] || \
-		([ "${1}" != "run" ] && [ "${1}" != "build" ]) || \
+		([ "${1}" != "run" ] && [ "${1}" != "build" ] && [ "${1}" != "kill" ]) || \
 		([ ! `echo "${2}" | grep -E "([0-9]{2}\.[0-9]{2})"` ] && [ "${2}" != "all" ]); then 
-			log error "usage: ${0} [run] [build] <version>"
+			log error "usage: ${0} [run] [build] [kill] <version>"
 			log error "versions: all, `for v0 in ${VERSIONS[@]}; do echo -e $v0", \c"; done`"
 			return 1
 	fi
@@ -53,12 +53,10 @@ function argument_handling()
 	case "${1}" in
 		"build")			
 			if [ "${2}" == "all" ]; then
-				log error "To-Do"
+				log warning "To-Do"
 				#docker build -t pwnker "./ubuntu-*"
-				return 0
 			else
 				docker build -t "pwnker-ubuntu-${2}" "${PWNKER_DIR}/ubuntu-${2}" --no-cache=false
-				return 0
 			fi
 		;;
 		"run")
@@ -74,10 +72,19 @@ function argument_handling()
 			fi
 		;;
 		"kill")
+			if [ "${2}" == "all" ]; then
+				log warning "To-Do"
+			else
+				if [ "`docker container ls -a | grep "pwnker-ubuntu-${2}"`" ]; then
+					docker kill "pwnker-ubuntu-${2}"
+				else
+					log warning "Cannot found the corresponding container."
+					return 1
+				fi
+			fi			
 		;;
-		#"*"
 	esac
-
+	return 0
 }
 
 function main()
