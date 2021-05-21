@@ -58,6 +58,12 @@ RUN pip3 install --upgrade pip && \
 
 RUN wget -q -O- https://github.com/hugsy/gef/raw/master/scripts/gef.sh | bash
 
+RUN curl https://raw.githubusercontent.com/andrewbae/dotfiles/master/.bash_profile > /root/.bash_profile
+RUN curl https://raw.githubusercontent.com/andrewbae/dotfiles/master/.tmux.conf > /root/.bash_profile
+RUN curl https://raw.githubusercontent.com/andrewbae/dotfiles/master/.vimrc > /root/.vimrc
+RUN curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+
 VOLUME ["/pwn"]
 WORKDIR /pwn
 
