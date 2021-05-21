@@ -60,18 +60,22 @@ function argument_handling()
 				docker build -t "pwnker-ubuntu-${2}" "${PWNKER_DIR}/ubuntu-${2}" --no-cache=false
 				return 0
 			fi
-			;;
+		;;
 		"run")
 			if [ "`docker image ls -a | grep "pwnker-ubuntu-${2}"`" ]; then
-				docker run -d --rm -h "pwnker-ubuntu-${2}" --name "pwnker-ubuntu-${2}" -v $PWD:/pwn -p 12341:12341 --cap-add=SYS_PTRACE -t "pwnker-ubuntu-${2}" /bin/bash 
+				if ( ! [ "`docker container ls -a | grep "pwnker-ubuntu-${2}"`" ]); then
+					docker run -d --rm -h "pwnker-ubuntu-${2}" --name "pwnker-ubuntu-${2}" -v ~/:/root -p 12341:12341 --cap-add=SYS_PTRACE -t "pwnker-ubuntu-${2}" /bin/bash 
+				fi
 				docker exec -it "pwnker-ubuntu-${2}" /bin/bash
-				return 0
 			else
 				log error "Cannot found the corresponding container. Make sure to build this container before running this container."	
 				log warning "Try: pwnker build ${2}"
 				return 1
 			fi
-			;;
+		;;
+		"kill")
+		;;
+		#"*"
 	esac
 
 }

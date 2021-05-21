@@ -57,7 +57,6 @@ RUN pip3 install --upgrade pip && \
 
 RUN wget -q -O- https://github.com/hugsy/gef/raw/master/scripts/gef.sh | bash
 
-VOLUME ["/pwn"]
-WORKDIR /pwn
+WORKDIR /root
 
 CMD ["/sbin/my_init"]
