@@ -22,12 +22,12 @@ Make sure you have installed the following prerequisites on your computer
 To install the pwnker, run this from the command-line:
 
 ```bash
-$ /bin/bash -c "$(curl https://raw.githubusercontent.com/andrewbae/pwnker/master/setup.sh) install"
+/bin/bash -c "$(curl https://raw.githubusercontent.com/andrewbae/pwnker/master/setup.sh) install"
 ```
 
 To uninstall the pwnker, run this from the command-line:
 
 ```bash
-$ /bin/bash -c "$(curl https://raw.githubusercontent.com/andrewbae/pwnker/master/setup.sh) uninstall"
+/bin/bash -c "$(curl https://raw.githubusercontent.com/andrewbae/pwnker/master/setup.sh) uninstall"
 ```
 
