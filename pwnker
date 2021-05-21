@@ -83,7 +83,9 @@ function argument_handling()
 					done
 			else
 				if [ "`docker container ls -a | grep "pwnker-ubuntu-${2}"`" ]; then
-					docker kill "pwnker-ubuntu-${2}"
+						docker kill "pwnker-ubuntu-${2}" 2>/dev/zero 1>/dev/zero
+						if [ ${?} == 0 ]; then log info "pwnker-ubuntu${2} is killed";
+						else log warning "pwnker-ubuntu${2} is already killed"; fi
 				else
 					log warning "Cannot found the corresponding container."
 					return 1
