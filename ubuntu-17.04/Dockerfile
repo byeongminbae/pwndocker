@@ -1,6 +1,9 @@
 FROM ubuntu:17.04
 MAINTAINER Andrew Bae <andy@pwner.kr>
 
+RUN sed -i 's/archive.ubuntu.com/old-releases.ubuntu.com/g' /etc/apt/sources.list
+RUN sed -i 's/security.ubuntu.com/old-releases.ubuntu.com/g' /etc/apt/sources.list
+
 RUN dpkg --add-architecture i386 && \
 	apt update -y && \
 	apt install -y \
