@@ -48,6 +48,34 @@ function sanity_check()
 	return 0
 }
 
+function argument_handling() 
+{
+	case "${1}" in
+		"build")			
+			if [ "${2}" == "all" ]; then
+				log error "To-Do"
+				#docker build -t pwnker "./ubuntu-*"
+				return 0
+			else
+				docker build -t "pwnker-ubuntu-${2}" "${PWNKER_DIR}/ubuntu-${2}" --no-cache=false
+				return 0
+			fi
+			;;
+		"run")
+			if [ "`docker image ls -a | grep "pwnker-ubuntu-${2}"`" ]; then
+				docker run -d --rm -h "pwnker-ubuntu-${2}" --name "pwnker-ubuntu-${2}" -v $PWD:/pwn -p 12341:12341 --cap-add=SYS_PTRACE -t "pwnker-ubuntu-${2}" /bin/bash 
+				docker exec -it "pwnker-ubuntu-${2}" /bin/bash
+				return 0
+			else
+				log error "Cannot found the corresponding container. Make sure to build this container before running this container."	
+				log warning "Try: pwnker build ${2}"
+				return 1
+			fi
+			;;
+	esac
+
+}
+
 function main()
 {
 	log info "${YELLOW}${PROJECT} - ${DESCRIPTION}${NC}"
@@ -55,26 +83,9 @@ function main()
 	
 	sanity_check $@
 	if [ $? == 1 ]; then exit; fi
-
-	if [ "${1}" == "build" ]; then
-		if [ "${2}" == "all" ]; then
-			log rror "To-Do"
-			#docker build -t pwnker "./ubuntu-*"
-			exit
-		else
-			docker build -t "pwnker-ubuntu-${2}" "${PWNKER_DIR}/ubuntu-${2}" --no-cache=false
-			exit
-		fi
-	fi
-
-	if [ "${1}" == "run" ] && [ "`docker image ls -a | grep "pwnker-ubuntu-${2}"`" ]; then
-		docker run -d --rm -h "pwnker-ubuntu-${2}" --name "pwnker-ubuntu-${2}" -v $PWD:/pwn -p 12341:12341 --cap-add=SYS_PTRACE -t "pwnker-ubuntu-${2}" /bin/bash 
-		docker exec -it "pwnker-ubuntu-${2}" /bin/bash
-	else
-		log error "Cannot found the corresponding container. Make sure to build this container before running this container."	
-		log warning "Try: pwnker build ${2}"
-		exit
-	fi
+	
+	argument_handling $@
+	if [ $? == 1 ]; then exit; fi
 }
 
 main $@
