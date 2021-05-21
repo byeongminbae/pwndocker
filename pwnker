@@ -64,9 +64,9 @@ function argument_handling()
 		"run")
 			if [ "`docker image ls -a | grep "pwnker-ubuntu-${2}"`" ]; then
 				if ( ! [ "`docker container ls -a | grep "pwnker-ubuntu-${2}"`" ]); then
-					docker run -d --rm -h "pwnker-ubuntu-${2}" --name "pwnker-ubuntu-${2}" -v ~/:/root -p 12341:12341 --cap-add=SYS_PTRACE -t "pwnker-ubuntu-${2}" /bin/bash 
+					docker run -d --rm -h "pwnker-ubuntu-${2}" --name "pwnker-ubuntu-${2}" -v /:/pwn -p 12341:12341 --cap-add=SYS_PTRACE -t "pwnker-ubuntu-${2}" /bin/bash 
 				fi
-				docker exec -it "pwnker-ubuntu-${2}" /bin/bash
+				docker exec -it "pwnker-ubuntu-${2}" /bin/bash -c "cd /pwn/${PWD}"
 			else
 				log error "Cannot found the corresponding container. Make sure to build this container before running this container."	
 				log warning "Try: pwnker build ${2}"
