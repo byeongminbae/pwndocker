@@ -12,7 +12,7 @@ If you had to face any inconvenience or found some improvements for pwnker, Plea
 ## Supported versions
 
 * Ubuntu 16.04 - passed
-* Ubuntu 17.04
+* Ubuntu 17.04 - passed
 * Ubuntu 18.04
 * Ubuntu 19.04
 * Ubuntu 20.04
