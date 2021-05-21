@@ -53,7 +53,6 @@ function argument_handling()
 	case "${1}" in
 		"build")			
 			if [ "${2}" == "all" ]; then
-				log warning "To-Do"
 				for version in ${VERSIONS[@]}
 					do 
 						docker build -t "pwnker-ubuntu-${version}" "${PWNKER_DIR}/ubuntu-${version}" --no-cache=false
@@ -76,7 +75,12 @@ function argument_handling()
 		;;
 		"kill")
 			if [ "${2}" == "all" ]; then
-				log warning "To-Do"
+				for version in ${VERSIONS[@]}
+					do 
+						docker kill "pwnker-ubuntu-${version}" 2>/dev/zero 1>/dev/zero
+						if [ ${?} == 0 ]; then log info "pwnker-ubuntu${version} is killed";
+						else log warning "pwnker-ubuntu${version} is already killed"; fi
+					done
 			else
 				if [ "`docker container ls -a | grep "pwnker-ubuntu-${2}"`" ]; then
 					docker kill "pwnker-ubuntu-${2}"
