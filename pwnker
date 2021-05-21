@@ -39,12 +39,13 @@ function sanity_check()
 		([ ! `echo "${2}" | grep -E "([0-9]{2}\.[0-9]{2})"` ] && [ "${2}" != "all" ]); then 
 			log error "usage: ${0} [run] [build] <version>"
 			log error "versions: all, `for v0 in ${VERSIONS[@]}; do echo -e $v0", \c"; done`"
-			exit
+			return 1
 	fi
 	if [ "${1}" == "run" ] && [ "${2}" == "all" ] ; then
 		log error "usage: ${0} build all";
-		exit
+		return 1
 	fi
+	return 0
 }
 
 function main()
@@ -53,6 +54,8 @@ function main()
 	log info "Author - ${GITHUB}"
 	
 	sanity_check $@
+	if [ $? == 1 ]; then exit; fi
+
 	if [ "${1}" == "build" ]; then
 		if [ "${2}" == "all" ]; then
 			log rror "To-Do"
