@@ -1,8 +1,8 @@
 FROM ubuntu:18.04
 MAINTAINER Andrew Bae <andy@pwner.kr>
 
-#RUN sed -i 's/archive.ubuntu.com/old-releases.ubuntu.com/g' /etc/apt/sources.list
-#RUN sed -i 's/security.ubuntu.com/old-releases.ubuntu.com/g' /etc/apt/sources.list
+ENV LANG C.UTF-8
+ENV LC_ALL C.UTF-8
 
 RUN dpkg --add-architecture i386 && \
 	apt update -y && \

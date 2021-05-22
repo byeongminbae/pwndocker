@@ -1,6 +1,9 @@
 FROM ubuntu:20.04
 MAINTAINER Andrew Bae <andy@pwner.kr>
 
+ENV LANG C.UTF-8
+ENV LC_ALL C.UTF-8
+
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN dpkg --add-architecture i386 && \

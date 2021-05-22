@@ -1,6 +1,9 @@
 FROM ubuntu:16.04
 MAINTAINER Andrew Bae <andy@pwner.kr>
 
+ENV LANG C.UTF-8
+ENV LC_ALL C.UTF-8
+
 RUN sed -i 's/archive.ubuntu.com/mirror.kakao.com/g' /etc/apt/sources.list
 
 RUN dpkg --add-architecture i386 && \
