@@ -57,7 +57,8 @@ RUN pip3 install --upgrade pip && \
     capstone \
     angr \
     pebble \
-    r2pipe	
+    r2pipe \
+	six==1.12.0
 
 RUN wget -q -O- https://github.com/hugsy/gef/raw/master/scripts/gef.sh | bash
 
