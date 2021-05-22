@@ -52,7 +52,7 @@ That's all! after build all docker images just once, you don't have to build the
 
 You can run the ubuntu version you want.
 
-Basically, the current user's home folder is mapped to `/root`
+Basically, when running a new container, default pwd is following the user's present pwd.
 
 ```
 pwnker run 16.04 # or any version you want
