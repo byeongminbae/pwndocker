@@ -61,6 +61,7 @@ RUN pip3 install --upgrade pip && \
 
 RUN wget -q -O- https://github.com/hugsy/gef/raw/master/scripts/gef.sh | bash
 
+RUN curl https://raw.githubusercontent.com/slimm609/checksec.sh/master/checksec > /usr/local/bin/checksec
 RUN curl https://raw.githubusercontent.com/andrewbae/dotfiles/master/.bash_profile > /root/.bash_profile
 RUN curl https://raw.githubusercontent.com/andrewbae/dotfiles/master/.tmux.conf > /root/.bash_profile
 RUN curl https://raw.githubusercontent.com/andrewbae/dotfiles/master/.vimrc > /root/.vimrc
