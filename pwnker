@@ -64,7 +64,7 @@ function argument_handling()
 		"run")
 			if [ "`docker image ls -a | grep "pwnker-ubuntu-${2}"`" ]; then
 				if ( ! [ "`docker container ls -a | grep "pwnker-ubuntu-${2}"`" ]); then
-					docker run -d --rm -h "pwnker-ubuntu-${2}" --name "pwnker-ubuntu-${2}" -v $HOME/:/pwn -p 12341:12341 --cap-add=SYS_PTRACE --security-opt seccomp=unconfined -t "pwnker-ubuntu-${2}" /bin/bash 
+					docker run -d --rm -h "pwnker-ubuntu-${2}" --name "pwnker-ubuntu-${2}" -v $HOME/:/pwn --cap-add=SYS_PTRACE --security-opt seccomp=unconfined -t "pwnker-ubuntu-${2}" /bin/bash 
 				fi
 				current_path=$(echo $PWD | sed "s/`echo $HOME | sed "s/\//\\\\\\\\\//g"`/\//g")
 				docker exec -it "pwnker-ubuntu-${2}" /bin/bash -c "cd /pwn/${current_path} && /bin/bash"
