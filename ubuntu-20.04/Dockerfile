@@ -44,7 +44,7 @@ RUN curl https://bootstrap.pypa.io/pip/3.5/get-pip.py > /tmp/get-pip.py && pytho
 RUN curl https://bootstrap.pypa.io/pip/2.7/get-pip.py > /tmp/get-pip.py && python2 /tmp/get-pip.py
 
 RUN pip3 install --upgrade pip && \
-    python3 -m pip install --no-cache-dir \
+    python3 -m pip install --upgrade --no-cache-dir \
     ropgadget \
     pwntools \
     z3-solver \
@@ -57,7 +57,7 @@ RUN pip3 install --upgrade pip && \
     angr \
     pebble \
     r2pipe \
-	six==1.12.0
+	six
 
 RUN wget -q -O- https://github.com/hugsy/gef/raw/master/scripts/gef.sh | bash
 
