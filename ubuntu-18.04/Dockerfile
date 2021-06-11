@@ -4,6 +4,7 @@ MAINTAINER Andrew Bae <andy@pwner.kr>
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
 
+RUN sed -i 's/archive.ubuntu.com/mirror.kakao.com/g' /etc/apt/sources.list
 RUN dpkg --add-architecture i386 && \
 	apt update -y && \
 	apt install -y \
@@ -38,9 +39,13 @@ RUN dpkg --add-architecture i386 && \
     patchelf \
     file 
 
+RUN gpg --keyserver hkp://pool.sks-keyservers.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
+RUN \curl -sSL https://get.rvm.io | bash -s stable --ruby
+RUN /bin/bash -l -c "rvm install ruby --latest"
+RUN /bin/bash -l -c "gem install one_gadget"
+
 RUN curl https://bootstrap.pypa.io/pip/3.5/get-pip.py > /tmp/get-pip.py && python3 /tmp/get-pip.py
 RUN curl https://bootstrap.pypa.io/pip/2.7/get-pip.py > /tmp/get-pip.py && python2 /tmp/get-pip.py
-
 RUN pip3 install --upgrade pip && \
     python3 -m pip install --upgrade --no-cache-dir \
     ropgadget \
@@ -58,15 +63,16 @@ RUN pip3 install --upgrade pip && \
 	six
 
 RUN wget -q -O- https://github.com/hugsy/gef/raw/master/scripts/gef.sh | bash
-
 RUN curl https://raw.githubusercontent.com/slimm609/checksec.sh/master/checksec > /usr/local/bin/checksec
+# dotfiles
 RUN curl https://raw.githubusercontent.com/andrewbae/dotfiles/master/.bash_profile > /root/.bash_profile
 RUN curl https://raw.githubusercontent.com/andrewbae/dotfiles/master/.tmux.conf > /root/.bash_profile
 RUN curl https://raw.githubusercontent.com/andrewbae/dotfiles/master/.vimrc > /root/.vimrc
 RUN curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+RUN echo "source /etc/profile.d/rvm.sh" >> /root/.bashrc
 
 VOLUME ["/pwn"]
 WORKDIR /pwn
 
-CMD ["/sbin/my_init"]
+CMD ["/bin/bash"]
