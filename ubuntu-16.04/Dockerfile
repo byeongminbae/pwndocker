@@ -60,7 +60,7 @@ RUN pip3 install --upgrade pip && \
     angr \
     pebble \
     r2pipe \
-	six
+    six==1.12.0
 
 RUN wget -q -O- https://github.com/hugsy/gef/raw/master/scripts/gef.sh | bash
 RUN curl https://raw.githubusercontent.com/slimm609/checksec.sh/master/checksec > /usr/local/bin/checksec
