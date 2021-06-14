@@ -46,6 +46,25 @@ RUN /bin/bash -l -c "gem install one_gadget"
 
 RUN curl https://bootstrap.pypa.io/pip/3.5/get-pip.py > /tmp/get-pip.py && python3 /tmp/get-pip.py
 RUN curl https://bootstrap.pypa.io/pip/2.7/get-pip.py > /tmp/get-pip.py && python2 /tmp/get-pip.py
+
+RUN pip2 install --upgrade pip && \
+    python2 -m pip install --upgrade --no-cache-dir \
+    gitdb2==2.0.6 \
+    GitPython==2.1.14 \
+    ropgadget \
+    pwntools \
+    z3-solver \
+    smmap2 \
+    apscheduler \
+    ropper \
+    unicorn \
+    keystone-engine \
+    capstone \
+    angr \
+    pebble \
+    r2pipe \
+	six
+
 RUN pip3 install --upgrade pip && \
     python3 -m pip install --upgrade --no-cache-dir \
     ropgadget \
@@ -60,7 +79,7 @@ RUN pip3 install --upgrade pip && \
     angr \
     pebble \
     r2pipe \
-    six==1.12.0
+	six
 
 RUN wget -q -O- https://github.com/hugsy/gef/raw/master/scripts/gef.sh | bash
 RUN curl https://raw.githubusercontent.com/slimm609/checksec.sh/master/checksec > /usr/local/bin/checksec
