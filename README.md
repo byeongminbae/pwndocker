@@ -8,11 +8,11 @@ The goal of pwnker is to make it more convenient when I playing pwn such as part
 Especially, heap exploitation requires various environments because the exploit is not working depending on system environment such as protection techniques, libc versions, etc.
 
 # Supported versions
-* Ubuntu 16.04 - ✅
-* Ubuntu 17.04 - ✅
-* Ubuntu 18.04 - ✅
-* Ubuntu 19.04 - ✅
-* Ubuntu 20.04 - ✅
+* Ubuntu 16.04
+* Ubuntu 17.04
+* Ubuntu 18.04
+* Ubuntu 19.04
+* Ubuntu 20.04
 
 # Getting started
 ## Prerequisites
