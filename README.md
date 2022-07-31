@@ -58,7 +58,6 @@ To kill corresponding container, run this from the command-line:
 $ pwnker kill 16.04 # or any version you want
 ```
 
-# Contributions
-Report issues or open pull request with improvements  
-You can contact me directly via email  
-andy@pwner.kr
+# Contribution
+
+Report issues or open pull requests with improvements  
