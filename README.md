@@ -46,7 +46,7 @@ That's all! after build all docker images just once, you don't have to build the
 
 You can run the ubuntu version you want.
 
-Basically, when running a new container, default pwd is following the user's present pwd.
+Basically, when running a new container, the default path is following the user's present path.
 
 ```shell
 $ pwnker run 16.04 # or any version you want
