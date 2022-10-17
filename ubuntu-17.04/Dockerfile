@@ -1,14 +1,15 @@
 FROM ubuntu:17.04
-MAINTAINER Andrew Bae <andy@pwner.kr>
+LABEL MAINTAINER = "https://github.com/andrewbae"
 
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
 
 RUN sed -i 's/archive.ubuntu.com/old-releases.ubuntu.com/g' /etc/apt/sources.list
 RUN sed -i 's/security.ubuntu.com/old-releases.ubuntu.com/g' /etc/apt/sources.list
-RUN dpkg --add-architecture i386 && \
-	apt update -y && \
-	apt install -y \
+
+RUN dpkg --add-architecture i386
+RUN apt-get update -y
+RUN apt-get install -y \
 	libc6:i386 \
     libc6-dbg:i386 \
     libc6-dbg \
@@ -39,36 +40,19 @@ RUN dpkg --add-architecture i386 && \
     git \
     patchelf \
     file \
-    dirmngr
+    software-properties-common
 
-RUN gpg --keyserver keyserver.ubuntu.com --recv-key 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
-RUN \curl -sSL https://get.rvm.io | bash -s stable --ruby
-RUN /bin/bash -l -c "rvm install ruby --latest"
+RUN apt-add-repository ppa:brightbox/ruby-ng
+RUN apt-get update -y
+RUN apt-get install ruby2.4 ruby2.4-dev -y
+
 RUN /bin/bash -l -c "gem install one_gadget"
 
-RUN curl https://bootstrap.pypa.io/pip/3.5/get-pip.py > /tmp/get-pip.py && python3 /tmp/get-pip.py
-RUN curl https://bootstrap.pypa.io/pip/2.7/get-pip.py > /tmp/get-pip.py && python2 /tmp/get-pip.py
+RUN curl "https://bootstrap.pypa.io/pip/3.5/get-pip.py" -o "/tmp/get-pip.py"
+RUN python3 /tmp/get-pip.py
 
-RUN pip2 install --upgrade pip && \
-    python2 -m pip install --upgrade --no-cache-dir \
-    gitdb2==2.0.6 \
-    GitPython==2.1.14 \
-    ropgadget \
-    pwntools \
-    z3-solver \
-    smmap2 \
-    apscheduler \
-    ropper \
-    unicorn \
-    keystone-engine \
-    capstone \
-    angr \
-    pebble \
-    r2pipe \
-	six==1.12.0
-
-RUN pip3 install --upgrade pip && \
-    python3 -m pip install --upgrade --no-cache-dir \
+RUN pip3 install --upgrade pip
+RUN python3 -m pip install --upgrade --no-cache-dir \
     ropgadget \
     pwntools \
     z3-solver \
@@ -81,17 +65,12 @@ RUN pip3 install --upgrade pip && \
     angr \
     pebble \
     r2pipe 
-RUN python3 -m pip install six==1.12.0
+
+# if you get pwntools six module error, uncomment this line    
+# RUN python3 -m pip install six==1.12.0
 
 RUN wget -q -O- https://github.com/hugsy/gef/raw/master/scripts/gef.sh | bash
 RUN curl https://raw.githubusercontent.com/slimm609/checksec.sh/master/checksec > /usr/local/bin/checksec
-# dotfiles
-RUN curl https://raw.githubusercontent.com/andrewbae/dotfiles/master/.bash_profile > /root/.bash_profile
-RUN curl https://raw.githubusercontent.com/andrewbae/dotfiles/master/.tmux.conf > /root/.bash_profile
-RUN curl https://raw.githubusercontent.com/andrewbae/dotfiles/master/.vimrc > /root/.vimrc
-RUN curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
-    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-RUN echo "source /etc/profile.d/rvm.sh" >> /root/.bashrc
 
 VOLUME ["/pwn"]
 WORKDIR /pwn
