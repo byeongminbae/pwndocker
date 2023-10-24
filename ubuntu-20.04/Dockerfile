@@ -65,10 +65,7 @@ RUN python3 -m pip install --upgrade --no-cache-dir \
     pebble \
     r2pipe 
 
-# if you get pwntools six module error, uncomment this line    
-# RUN python3 -m pip install six==1.12.0
-
-RUN wget -q -O- https://github.com/hugsy/gef/raw/master/scripts/gef.sh | bash
+RUN bash -c "$(curl -fsSL https://gef.blah.cat/sh)"
 RUN curl https://raw.githubusercontent.com/slimm609/checksec.sh/master/checksec > /usr/local/bin/checksec
 
 VOLUME ["/pwn"]
