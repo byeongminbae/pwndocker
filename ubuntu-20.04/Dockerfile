@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM amd64/ubuntu:20.04
 LABEL MAINTAINER = "https://github.com/andrewbae"
 
 ENV LANG C.UTF-8

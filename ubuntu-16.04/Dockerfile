@@ -1,4 +1,4 @@
-FROM ubuntu:16.04
+FROM amd64/ubuntu:16.04
 LABEL MAINTAINER = "https://github.com/andrewbae"
 
 ENV LANG C.UTF-8
@@ -14,16 +14,11 @@ RUN apt-get install -y \
     g++-multilib \
 	curl \
     cmake \
-    ipython3 \
     vim \
     net-tools \
     iputils-ping \
     libffi-dev \
     libssl-dev \
-	python3\
-    python3-dev \
-	python\
-	python-dev\
     build-essential \
     tmux \
     strace \
@@ -37,19 +32,32 @@ RUN apt-get install -y \
     git \
     patchelf \
     file \
-    software-properties-common
+    libreadline-gplv2-dev \
+    libncursesw5-dev \
+    libsqlite3-dev \
+    tk-dev \
+    libgdbm-dev \
+    libc6-dev \
+    libbz2-dev \
+    software-properties-common \
+    lsb-release
 
-RUN apt-add-repository ppa:brightbox/ruby-ng
-RUN apt-get update -y
-RUN apt-get install ruby2.4 ruby2.4-dev -y
 
-RUN /bin/bash -l -c "gem install one_gadget"
+# python
+RUN wget https://www.python.org/ftp/python/3.9.0/Python-3.9.0.tgz
+RUN tar -xvf Python-3.9.0.tgz
+WORKDIR Python-3.9.0
 
-RUN curl "https://bootstrap.pypa.io/get-pip.py" -o "/tmp/get-pip.py"
-RUN python3 /tmp/get-pip.py
+RUN ./configure
+RUN make -j $(nproc)
+RUN make install -j $(nproc)
 
-RUN pip3 install --upgrade pip
-RUN python3 -m pip install --upgrade --no-cache-dir \
+RUN update-alternatives --install /usr/bin/python3 python3 /usr/local/bin/python3.9 1
+
+
+RUN sed -i '1s/python/python3.9/' /usr/bin/lsb_release
+
+RUN pip3 install \
     ropgadget \
     pwntools \
     z3-solver \
@@ -61,13 +69,21 @@ RUN python3 -m pip install --upgrade --no-cache-dir \
     capstone \
     angr \
     pebble \
-    r2pipe 
+    r2pipe
 
-# if you get pwntools six module error, uncomment this line    
-# RUN python3 -m pip install six==1.12.0
-
+# gdb plugin
 RUN wget -q -O- https://github.com/hugsy/gef/raw/master/scripts/gef.sh | bash
+
+# checksec
 RUN curl https://raw.githubusercontent.com/slimm609/checksec.sh/master/checksec > /usr/local/bin/checksec
+
+# ruby
+RUN gpg --keyserver hkp://keyserver.ubuntu.com --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
+RUN \curl -sSL https://get.rvm.io | bash -s stable --ruby
+RUN echo "source /usr/local/rvm/scripts/rvm" >> /etc/profile
+
+RUN /bin/bash -l -c "gem install one_gadget"
+
 
 VOLUME ["/pwn"]
 WORKDIR /pwn
