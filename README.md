@@ -9,11 +9,11 @@ pwndocker provides various Ubuntu environments, making it easy to handle such cu
 If you want to add any tools or come across any issues, please leave an issue.  
 
 ## Supported versions
-* Ubuntu 16.04 ✅
-* Ubuntu 17.04 ✅
-* Ubuntu 18.04 ✅
-* Ubuntu 19.04 ✅
-* Ubuntu 20.04 ✅
+* Ubuntu 16.04 - There is an issue with the GDB plugin not functioning correctly.
+* Ubuntu 17.04 - No known issues
+* Ubuntu 18.04 - No known issues
+* Ubuntu 19.04 - No known issues
+* Ubuntu 20.04 - No known issues
 
 ## Getting started
 ### Prerequisites
