@@ -1,62 +1,46 @@
 # pwnker
-The pwnker is providing a docker environment for pwners.
+This project is created for the purpose of participating in hacking CTFs and wargames.  
 
-The goal of pwnker is to make it more convenient when I playing pwn such as participate in CTF or playing wargames. 
-Especially, heap exploitation requires various environments because the exploit is not working depending on system environment such as protection techniques, libc versions, etc.  
+In particular, heap exploitation may not work in specific environments (e.g., due to protection techniques or libc version).  
+Of course, you can set up the environment without using pwndocker, but...  
 
-![ezgif com-gif-maker](https://user-images.githubusercontent.com/40394063/195825077-29eb5259-2084-4ca2-bf7d-a0cf1b7bca53.gif)
+pwndocker provides various Ubuntu environments, making it easy to handle such cumbersome version switching.  
 
-# Supported versions
-* Ubuntu 16.04
-* Ubuntu 17.04
-* Ubuntu 18.04
-* Ubuntu 19.04
-* Ubuntu 20.04
+If you want to add any tools or come across any issues, please leave an issue.  
 
-# Getting started
-## Prerequisites
-Make sure you have installed the following prerequisites on your computer
-* Docker 
-* Git 
-* cURL 
+## Supported versions
+* Ubuntu 16.04 ✅
+* Ubuntu 17.04 ✅
+* Ubuntu 18.04 ✅
+* Ubuntu 19.04 ✅
+* Ubuntu 20.04 ✅
 
-## Quick Install
-
-To install the pwnker, run this from the command-line:
-
-```shell
-$ /bin/bash -c "$(curl https://raw.githubusercontent.com/andrewbae/pwnker/master/setup.sh) install"
+## Getting started
+### Prerequisites
+This project requires Docker, Git, curl to be installed for it to function
+### Installation
+To install, enter the following command.
+```bash
+$ curl -s https://raw.githubusercontent.com/andrewbae/pwndocker/main/setup.sh | bash /dev/stdin install
+```
+To uninstall, enter the following command.
+```bash
+$ curl -s https://raw.githubusercontent.com/andrewbae/pwndocker/main/setup.sh | bash /dev/stdin uninstall
 ```
 
-To uninstall the pwnker, run this from the command-line:
-
-```shell
-$ /bin/bash -c "$(curl https://raw.githubusercontent.com/andrewbae/pwnker/master/setup.sh) uninstall"
+### Usage
+Before using it, you need to build the Docker images. It's recommended to build all the images.
+```bash
+$ pd build all
+```
+That's it! Once you've built all the images once, you don't need to build them anymore.  
+To start or stop the container, use the 'run' or 'kill' commands, respectively.
+```bash
+$ pd run 16.04
+$ pd run 17.04
+$ pd kill 16.04
+$ pd kill all
 ```
 
-## Usage
-Build the image to use if you did not build that image before using pwnker.
-It is recommended that you build all docker images.
-```shell
-$ pwnker build all
-```
+When the container is started, the host's `$HOME` directory is automatically mounted to the container's `/pwn` directory.
 
-That's all! after build all docker images just once, you don't have to build them anymore.
-
-You can run the ubuntu version you want.
-
-Basically, when running a new container, the default path is following the user's present path.
-
-```shell
-$ pwnker run 16.04 # or any version you want
-```
-
-To kill corresponding container, run this from the command-line:
-
-```shell
-$ pwnker kill 16.04 # or any version you want
-```
-
-# Contribution
-
-Report issues or open pull requests with improvements  
