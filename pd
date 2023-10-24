@@ -16,17 +16,21 @@ class ModeEnum(Enum):
     kill = auto()
 
 
-class AppConfig:
-    def get_mode_factory(self):
-        return ModeFactory()
+class ModeFactory:
+    _mode_map = {}
 
+    def add(self, mode_type, mode_class):
+        self._mode_map[mode_type] = mode_class
 
-app_config = AppConfig()
+    def get(self, mode_type):
+        if mode_type not in self._mode_map:
+            raise ValueError("invalid mode")
+        return self._mode_map[mode_type]()
 
 
 def mode_decorator(mode_type):
     def decorator(cls):
-        app_config.get_mode_factory().add(mode_type, cls)
+        ModeFactory().add(mode_type, cls)
         return cls
 
     return decorator
@@ -40,18 +44,6 @@ def execute_command(args):
         return False
 
 
-class ModeFactory:
-    _mode_map = {}
-
-    def add(self, mode_type, mode_class):
-        self._mode_map[mode_type] = mode_class
-
-    def get(self, mode_type):
-        if mode_type not in self._mode_map:
-            raise ValueError("invalid mode")
-        return self._mode_map[mode_type]()
-
-
 class ModeInterface(ABC):  # abstract class
     @abstractmethod
     def run(self, version):
@@ -61,10 +53,10 @@ class ModeInterface(ABC):  # abstract class
 @mode_decorator(mode_type=ModeEnum.run)
 class RunMode(ModeInterface):
     def __init__(self):
-        self.version = None
+        self._version = None
 
     def run(self, version):
-        self.version = version
+        self._version = version
 
         if not self._is_docker_image_exist():
             raise RuntimeError("Docker image not found. Please build it before using.")
@@ -76,67 +68,68 @@ class RunMode(ModeInterface):
         return self._attach_docker_container()
 
     def _is_docker_image_exist(self):
-        return execute_command(f"docker image ls -a | grep 'pwndocker-ubuntu-{self.version}' > /dev/null 2>&1")
+        return execute_command(f"docker image ls -a | grep 'pwndocker-ubuntu-{self._version}' > /dev/null 2>&1")
 
     def _is_docker_container_exist(self):
-        return execute_command(f"docker container ls -a | grep 'pwndocker-ubuntu-{self.version}' > /dev/null 2>&1")
+        return execute_command(f"docker container ls -a | grep 'pwndocker-ubuntu-{self._version}' > /dev/null 2>&1")
 
     def _run_docker_image(self):
-        return execute_command(f"docker run -d --rm -h 'pwndocker-ubuntu-{self.version}' "
-                               f"--name 'pwndocker-ubuntu-{self.version}' "
+        return execute_command(f"docker run -d --rm -h 'pwndocker-ubuntu-{self._version}' "
+                               f"--name 'pwndocker-ubuntu-{self._version}' "
                                f"-v $HOME:/pwn "
                                f"--cap-add=SYS_PTRACE --security-opt seccomp=unconfined "
-                               f"-t 'pwndocker-ubuntu-{self.version}' /bin/bash")
+                               f"-t 'pwndocker-ubuntu-{self._version}' /bin/bash")
 
     def _attach_docker_container(self):
-        return execute_command(f"docker exec -it 'pwndocker-ubuntu-{self.version}' /bin/bash "
+        return execute_command(f"docker exec -it 'pwndocker-ubuntu-{self._version}' /bin/bash "
                                f"-c 'cd /pwn/ && /bin/bash'")
 
 
 @mode_decorator(mode_type=ModeEnum.build)
 class BuildMode(ModeInterface):
     def __init__(self):
-        self.version = None
-        self.installed_path = "/usr/local/bin/pwndocker"
+        self._version = None
+        self._installed_path = "/usr/local/bin/pwndocker"
 
     def run(self, version):
-        self.version = version
-        if self.version == "all":
+        self._version = version
+        if self._version == "all":
             self._build_all_docker_image()
             return
         self._build_docker_image()
 
     def _build_all_docker_image(self):
         for v in supported_ubuntu_versions:
-            self.version = v
+            self._version = v
             self._build_docker_image()
 
     def _build_docker_image(self):
-        return execute_command(f"docker build -t 'pwndocker-ubuntu-{self.version}' "
-                               f"'{self.installed_path}/ubuntu-{self.version}'")
+        return execute_command(f"docker build -t 'pwndocker-ubuntu-{self._version}' "
+                               f"'{self._installed_path}/ubuntu-{self._version}'")
 
 
 @mode_decorator(mode_type=ModeEnum.kill)
 class KillMode(ModeInterface):
     def __init__(self):
-        self.version = None
+        self._version = None
+
     def run(self, version):
-        self.version = version
-        if self.version == "all":
+        self._version = version
+        if self._version == "all":
             self._kill_all_docker_container()
             return
         self._kill_docker_container()
 
     def _kill_all_docker_container(self):
         for v in supported_ubuntu_versions:
-            self.version = v
+            self._version = v
             self._kill_docker_container()
 
     def _kill_docker_container(self):
-        if execute_command(f"docker kill 'pwndocker-ubuntu-{self.version}' > /dev/null 2>&1"):
-            print(f"pwndocker-ubuntu-{self.version} Container has stopped")
+        if execute_command(f"docker kill 'pwndocker-ubuntu-{self._version}' > /dev/null 2>&1"):
+            print(f"pwndocker-ubuntu-{self._version} Container has stopped")
         else:
-            print(f"The pwndocker-ubuntu-{self.version} is not running")
+            print(f"The pwndocker-ubuntu-{self._version} is not running")
 
 
 if __name__ == "__main__":
@@ -153,7 +146,6 @@ if __name__ == "__main__":
     if not execute_command("docker version > /dev/null 2>&1"):
         raise RuntimeError("The Docker engine is not running. Please start the Docker engine first.")
 
-    mode_factory = app_config.get_mode_factory()
-    mode = mode_factory.get(ModeEnum[arguments.mode])
+    mode = ModeFactory().get(ModeEnum[arguments.mode])
 
     mode.run(arguments.version)
