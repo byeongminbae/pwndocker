@@ -1,42 +1,85 @@
 #!/usr/bin/python3
 
-import logging
 import argparse
-import os
 import subprocess
 from abc import ABC, abstractmethod
 from enum import Enum, auto
 
-supported_ubuntu_versions = ["16.04", "17.04", "18.04", "19.04", "20.04"]
+
+class ApplicationMode(Enum):
+    run: object = auto()
+    build: object = auto()
+    kill: object = auto()
 
 
-class ModeEnum(Enum):
-    run = auto()
-    build = auto()
-    kill = auto()
+class UbuntuVersion(Enum):
+    version_1604: str = "16.04"
+    version_1704: str = "17.04"
+    version_1804: str = "18.04"
+    version_1904: str = "19.04"
+    version_2004: str = "20.04"
 
 
-class ModeFactory:
-    _mode_map = {}
+class ArgumentHandler:
+    _arguments = None
 
-    def add(self, mode_type, mode_class):
-        self._mode_map[mode_type] = mode_class
+    def __init__(self):
+        argument_parser: argparse.ArgumentParser = argparse.ArgumentParser()
+        argument_parser.add_argument(
+            "mode",
+            choices=[app_mode_enum.name for app_mode_enum in ApplicationMode]
+        )
+        argument_parser.add_argument(
+            "version",
+            choices=[app_version_enum.value for app_version_enum in UbuntuVersion] + ["all"]
+        )
+        self._arguments = argument_parser.parse_args()
+        self._validate()
 
-    def get(self, mode_type):
-        if mode_type not in self._mode_map:
+    def get_mode(self) -> ApplicationMode:
+        return ApplicationMode[self._arguments.mode]
+
+    def get_version(self) -> list[UbuntuVersion]:
+        if self._arguments.version == "all":
+            return [v for v in UbuntuVersion]
+        return [UbuntuVersion(self._arguments.version)]
+
+    def _validate(self):
+        if self._is_argument_not_valid():
+            raise RuntimeError("In 'run' mode, the 'all' option is not available.")
+        if not self._is_docker_engine_running():
+            raise RuntimeError("The Docker engine is not running. Please start the Docker engine first.")
+
+    def _is_argument_not_valid(self):
+        return (self._arguments.mode == ApplicationMode.run.name and
+                self._arguments.version == "all")
+
+    def _is_docker_engine_running(self):
+        return execute_command("docker version > /dev/null 2>&1")
+
+
+class ApplicationModeFactory:
+    _instance_map: dict = {}
+
+    def add(self, mode: ApplicationMode, instance: object):
+        self._instance_map[mode] = instance
+
+    def get(self, mode: ApplicationMode):
+        if mode not in self._instance_map:
             raise ValueError("invalid mode")
-        return self._mode_map[mode_type]()
+        return self._instance_map[mode]
 
 
-def mode_decorator(mode_type):
+def mode_decorator(mode: ApplicationMode):
     def decorator(cls):
-        ModeFactory().add(mode_type, cls)
+        instance = cls(ArgumentHandler().get_version())
+        ApplicationModeFactory().add(mode, instance)
         return cls
 
     return decorator
 
 
-def execute_command(args):
+def execute_command(args: str) -> bool:
     try:
         subprocess.run(args, shell=True, check=True)
         return True
@@ -44,108 +87,88 @@ def execute_command(args):
         return False
 
 
-class ModeInterface(ABC):  # abstract class
+class ApplicationModeInterface(ABC):
     @abstractmethod
-    def run(self, version):
+    def run(self):
         pass
 
 
-@mode_decorator(mode_type=ModeEnum.run)
-class RunMode(ModeInterface):
-    def __init__(self):
-        self._version = None
+@mode_decorator(mode=ApplicationMode.run)
+class ApplicationRunMode(ApplicationModeInterface):
+    _ubuntu_version: UbuntuVersion
 
-    def run(self, version):
-        self._version = version
+    def __init__(self, ubuntu_versions: list[UbuntuVersion]):
+        self._ubuntu_version = ubuntu_versions[0]
 
+    def run(self):
         if not self._is_docker_image_exist():
             raise RuntimeError("Docker image not found. Please build it before using.")
 
         if self._is_docker_container_exist():
-            return self._attach_docker_container()
+            self._attach_docker_container()
+            return
 
         self._run_docker_image()
-        return self._attach_docker_container()
+        self._attach_docker_container()
 
-    def _is_docker_image_exist(self):
-        return execute_command(f"docker image ls -a | grep 'pwndocker-ubuntu-{self._version}' > /dev/null 2>&1")
+    def _is_docker_image_exist(self) -> bool:
+        return execute_command(f"docker image ls -a | "
+                               f"grep 'pwndocker-ubuntu-{self._ubuntu_version.value}' > /dev/null 2>&1")
 
-    def _is_docker_container_exist(self):
-        return execute_command(f"docker container ls -a | grep 'pwndocker-ubuntu-{self._version}' > /dev/null 2>&1")
+    def _is_docker_container_exist(self) -> bool:
+        return execute_command(f"docker container ls -a | "
+                               f"grep 'pwndocker-ubuntu-{self._ubuntu_version.value}' > /dev/null 2>&1")
 
-    def _run_docker_image(self):
-        return execute_command(f"docker run -d --rm -h 'pwndocker-ubuntu-{self._version}' "
-                               f"--name 'pwndocker-ubuntu-{self._version}' "
+    def _run_docker_image(self) -> bool:
+        return execute_command(f"docker run -d --rm -h 'pwndocker-ubuntu-{self._ubuntu_version.value}' "
+                               f"--name 'pwndocker-ubuntu-{self._ubuntu_version.value}' "
                                f"-v $HOME:/pwn "
                                f"--cap-add=SYS_PTRACE --security-opt seccomp=unconfined "
-                               f"-t 'pwndocker-ubuntu-{self._version}' /bin/bash")
+                               f"-t 'pwndocker-ubuntu-{self._ubuntu_version.value}' /bin/bash")
 
-    def _attach_docker_container(self):
-        return execute_command(f"docker exec -it 'pwndocker-ubuntu-{self._version}' /bin/bash "
+    def _attach_docker_container(self) -> bool:
+        return execute_command(f"docker exec -it 'pwndocker-ubuntu-{self._ubuntu_version.value}' /bin/bash "
                                f"-c 'cd /pwn/ && /bin/bash'")
 
 
-@mode_decorator(mode_type=ModeEnum.build)
-class BuildMode(ModeInterface):
-    def __init__(self):
-        self._version = None
+@mode_decorator(mode=ApplicationMode.build)
+class ApplicationBuildMode(ApplicationModeInterface):
+    _ubuntu_versions: list[UbuntuVersion]
+    _installed_path: str
+
+    def __init__(self, ubuntu_versions: list[UbuntuVersion]):
+        self._ubuntu_versions = ubuntu_versions
         self._installed_path = "/usr/local/bin/pwndocker"
 
-    def run(self, version):
-        self._version = version
-        if self._version == "all":
-            self._build_all_docker_image()
-            return
+    def run(self):
         self._build_docker_image()
 
-    def _build_all_docker_image(self):
-        for v in supported_ubuntu_versions:
-            self._version = v
-            self._build_docker_image()
-
     def _build_docker_image(self):
-        return execute_command(f"docker build -t 'pwndocker-ubuntu-{self._version}' "
-                               f"'{self._installed_path}/ubuntu-{self._version}'")
+        for ubuntu_version in self._ubuntu_versions:
+            execute_command(f"docker build -t 'pwndocker-ubuntu-{ubuntu_version.value}' "
+                            f"'{self._installed_path}/ubuntu-{ubuntu_version.value}'")
 
 
-@mode_decorator(mode_type=ModeEnum.kill)
-class KillMode(ModeInterface):
-    def __init__(self):
-        self._version = None
+@mode_decorator(mode=ApplicationMode.kill)
+class ApplicationKillMode(ApplicationModeInterface):
+    _ubuntu_versions: list[UbuntuVersion]
 
-    def run(self, version):
-        self._version = version
-        if self._version == "all":
-            self._kill_all_docker_container()
-            return
+    def __init__(self, ubuntu_versions: list[UbuntuVersion]):
+        self._ubuntu_versions = ubuntu_versions
+
+    def run(self):
         self._kill_docker_container()
 
-    def _kill_all_docker_container(self):
-        for v in supported_ubuntu_versions:
-            self._version = v
-            self._kill_docker_container()
-
     def _kill_docker_container(self):
-        if execute_command(f"docker kill 'pwndocker-ubuntu-{self._version}' > /dev/null 2>&1"):
-            print(f"pwndocker-ubuntu-{self._version} Container has stopped")
-        else:
-            print(f"The pwndocker-ubuntu-{self._version} is not running")
+        for ubuntu_version in self._ubuntu_versions:
+            if execute_command(f"docker kill 'pwndocker-ubuntu-{ubuntu_version.value}' > /dev/null 2>&1"):
+                print(f"pwndocker-ubuntu-{ubuntu_version.value} Container has stopped")
+            else:
+                print(f"The pwndocker-ubuntu-{ubuntu_version.value} is not running")
 
 
 if __name__ == "__main__":
-    argument_parser = argparse.ArgumentParser()
+    argument_handler = ArgumentHandler()
 
-    argument_parser.add_argument("mode", choices=[app_mode_enum.name for app_mode_enum in ModeEnum])
-    argument_parser.add_argument("version", choices=supported_ubuntu_versions + ["all"])
-
-    arguments = argument_parser.parse_args()
-
-    if arguments.mode == ModeEnum.run.name and arguments.version == "all":
-        raise RuntimeError("In 'run' mode, the 'all' option is not available.")
-
-    if not execute_command("docker version > /dev/null 2>&1"):
-        raise RuntimeError("The Docker engine is not running. Please start the Docker engine first.")
-
-    mode = ModeFactory().get(ModeEnum[arguments.mode])
-
-    mode.run(arguments.version)
+    mode: ApplicationModeInterface = ApplicationModeFactory().get(argument_handler.get_mode())
+    mode.run()
