@@ -17,7 +17,7 @@ If you want to add any tools or come across any issues, please leave an issue.
 
 ## Getting started
 ### Prerequisites
-This project requires Docker, Git, curl to be installed for it to function
+This project requires Docker, Git, curl, Python 3.6+ to be installed for it to function
 ### Installation
 To install, enter the following command.
 ```bash
